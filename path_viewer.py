@@ -57,30 +57,24 @@ def plot_lat_long(file_path):
     return selected_points
 
 
-def write_mission_file_from_plot(selected_points, directory_path):
-    # Ensure the directory exists, if not, create it
+def write_mission_file_from_plot(selected_points, directory_path, file_name):
     if not os.path.exists(directory_path):
-        print(" write_mission_file_from_plot: Directory not found")
+        print("write_mission_file_from_plot: Directory not found")
         return
     
-    # Define the path for the mission file inside the specified directory
-    mission_file_path = os.path.join(directory_path, "output.waypoints")
+    base_name = os.path.splitext(os.path.basename(file_name))[0]
+    mission_file_path = os.path.join(directory_path, f"{base_name}.waypoints")
     
-    # Open the .mission file in write mode
     with open(mission_file_path, 'w') as f:
-        # Write the header for the mission file
-        f.write("QGC WPL 110\n")  # Assuming version 110 as an example
-
-        # Iterate through the selected points and write each in the desired format
+        f.write("QGC WPL 110\n")
         for idx, (lat, lon) in enumerate(selected_points):
-            # <INDEX> <CURRENT WP> <COORD FRAME> <COMMAND> <PARAM1> <PARAM2> <PARAM3> <PARAM4> <PARAM5/X/LATITUDE> <PARAM6/Y/LONGITUDE> <PARAM7/Z/ALTITUDE> <AUTOCONTINUE>
             line = f"{idx} 0 3 16 0 0 0 0 {round(lat, 6)} {round(lon, 6)} 0 1\n"
             f.write(line)
-
+    
     print(f"Mission file written to {mission_file_path}")
 
 
 if __name__ == "__main__":
     file_path = input("Enter the path to the CSV file: ")
     selected = plot_lat_long(file_path)
-    write_mission_file_from_plot(selected, "/home/parallels/repos/path_planning_tool/mp_wp_missions")
+    write_mission_file_from_plot(selected, "/home/parallels/repos/path_planning_tool/mp_wp_missions", file_path)
