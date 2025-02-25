@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import os
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -39,7 +40,7 @@ def plot_lat_long(file_path):
     
     def on_pick(event):
         ind = event.ind[0]
-        point = (df.iloc[ind]['longitude'], df.iloc[ind]['latitude'])
+        point = (df.iloc[ind]['latitude'], df.iloc[ind]['longitude'])
         # Format to 6 decimal places
         formatted_point = [point[0], point[1]]
         selected_points.append(formatted_point)
@@ -56,6 +57,27 @@ def plot_lat_long(file_path):
     return selected_points
 
 
-# Example usage:
+def write_mission_file_from_plot(selected_points, directory_path):
+    # Ensure the directory exists, if not, create it
+    if not os.path.exists(directory_path):
+        print(" write_mission_file_from_plot: Directory not found")
+        return
+    
+    # Define the path for the mission file inside the specified directory
+    mission_file_path = os.path.join(directory_path, "output.waypoints")
+    
+    # Open the .mission file in write mode
+    with open(mission_file_path, 'w') as f:
+        # Write the header for the mission file
+        f.write("QGC WPL 110\n")  # Assuming version 110 as an example
+
+        # Iterate through the selected points and write each in the desired format
+        for idx, (lat, lon) in enumerate(selected_points):
+            # <INDEX> <CURRENT WP> <COORD FRAME> <COMMAND> <PARAM1> <PARAM2> <PARAM3> <PARAM4> <PARAM5/X/LATITUDE> <PARAM6/Y/LONGITUDE> <PARAM7/Z/ALTITUDE> <AUTOCONTINUE>
+            line = f"{idx} 0 3 16 0 0 0 0 {round(lat, 6)} {round(lon, 6)} 0 1\n"
+            f.write(line)
+
+    print(f"Mission file written to {mission_file_path}")
+
 selected = plot_lat_long("latlong_data.csv")
-print("Final selected points:", selected)
+write_mission_file_from_plot(selected, "asdfa")
