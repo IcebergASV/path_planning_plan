@@ -79,5 +79,8 @@ def write_mission_file_from_plot(selected_points, directory_path):
 
     print(f"Mission file written to {mission_file_path}")
 
-selected = plot_lat_long("latlong_data.csv")
-write_mission_file_from_plot(selected, "asdfa")
+
+if __name__ == "__main__":
+    file_path = input("Enter the path to the CSV file: ")
+    selected = plot_lat_long(file_path)
+    write_mission_file_from_plot(selected, "/home/parallels/repos/path_planning_tool/mp_wp_missions")
